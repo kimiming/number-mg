@@ -28,7 +28,7 @@ services:
       HOSTNAME: 0.0.0.0
       DATABASE_URL: postgresql://${POSTGRES_USER:-phone_admin}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-phone_admin_system}?schema=public
     volumes:
-      - uploads:/app/public/uploads
+      - ./public/uploads:/app/public/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -36,4 +36,3 @@ services:
 
 volumes:
   postgres_data:
-  uploads:

@@ -60,6 +60,7 @@ Assuming the code is already uploaded to `/opt/number-manager`:
 
 ```bash
 cd /opt/number-manager
+mkdir -p public/uploads
 cp .env.example .env
 ```
 
@@ -138,7 +139,7 @@ docker compose exec app npx prisma migrate deploy
 
 ## Notes
 
-- Uploads are persisted in the `uploads` Docker volume.
+- Uploads are persisted in the host-mounted `public/uploads` directory.
 - The database is persisted in the `postgres_data` Docker volume.
 - If `faster-whisper` needs to download a model, the server must have outbound network access.
 - You do not need to install Node.js, Python, or ffmpeg on the Ubuntu host. Docker handles those inside the container.
