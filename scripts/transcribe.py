@@ -7,6 +7,33 @@ import os
 import sys
 from pathlib import Path
 
+
+def configure_cache_dirs() -> Path:
+    cache_root = Path(os.getenv("WHISPER_CACHE_DIR", "/tmp/number-manager-cache")).resolve()
+    cache_root.mkdir(parents=True, exist_ok=True)
+
+    home_dir = cache_root / "home"
+    xdg_cache = cache_root / "xdg-cache"
+    hf_home = cache_root / "huggingface"
+    torch_home = cache_root / "torch"
+    ctranslate2_home = cache_root / "ctranslate2"
+
+    for directory in [home_dir, xdg_cache, hf_home, torch_home, ctranslate2_home]:
+        directory.mkdir(parents=True, exist_ok=True)
+
+    os.environ.setdefault("HOME", str(home_dir))
+    os.environ.setdefault("XDG_CACHE_HOME", str(xdg_cache))
+    os.environ.setdefault("HF_HOME", str(hf_home))
+    os.environ.setdefault("HUGGINGFACE_HUB_CACHE", str(hf_home / "hub"))
+    os.environ.setdefault("TRANSFORMERS_CACHE", str(hf_home / "transformers"))
+    os.environ.setdefault("TORCH_HOME", str(torch_home))
+    os.environ.setdefault("CTRANSFORMERS_CACHE", str(ctranslate2_home))
+
+    return cache_root
+
+
+configure_cache_dirs()
+
 from faster_whisper import WhisperModel
 
 
@@ -36,9 +63,16 @@ def load_model() -> WhisperModel:
     model_size = os.getenv("WHISPER_MODEL_SIZE", "base").strip()
     device = os.getenv("WHISPER_DEVICE", "cpu").strip()
     compute_type = os.getenv("WHISPER_COMPUTE_TYPE", "int8").strip()
+    download_root = os.getenv("WHISPER_DOWNLOAD_ROOT", "/tmp/number-manager-cache/models").strip()
 
     model_name_or_path = model_path or model_size
-    return WhisperModel(model_name_or_path, device=device, compute_type=compute_type)
+    Path(download_root).mkdir(parents=True, exist_ok=True)
+    return WhisperModel(
+        model_name_or_path,
+        device=device,
+        compute_type=compute_type,
+        download_root=download_root,
+    )
 
 
 def main() -> int:

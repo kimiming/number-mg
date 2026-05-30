@@ -27,8 +27,10 @@ services:
       PORT: 3000
       HOSTNAME: 0.0.0.0
       DATABASE_URL: postgresql://${POSTGRES_USER:-phone_admin}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-phone_admin_system}?schema=public
+      WHISPER_CACHE_DIR: ${WHISPER_CACHE_DIR:-/tmp/number-manager-cache}
     volumes:
       - ./public/uploads:/app/public/uploads
+      - whisper_cache:/tmp/number-manager-cache
     depends_on:
       db:
         condition: service_healthy
@@ -36,3 +38,4 @@ services:
 
 volumes:
   postgres_data:
+  whisper_cache:

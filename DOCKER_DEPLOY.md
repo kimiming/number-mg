@@ -73,6 +73,7 @@ POSTGRES_USER=phone_admin
 POSTGRES_PASSWORD=change-me-now
 JWT_SECRET=ab57aa55eabe448488c7d45b9a5466dad2cf286e10c493ee8161442b89a09fe3
 COOKIE_SECURE=false
+WHISPER_CACHE_DIR=/tmp/number-manager-cache
 ```
 
 Then edit the file on the server:
@@ -129,6 +130,7 @@ docker compose exec app npx prisma migrate deploy
 - `POSTGRES_PASSWORD`
 - `JWT_SECRET`
 - `COOKIE_SECURE`
+- `WHISPER_CACHE_DIR`
 - `DATABASE_URL` is assembled automatically inside Compose
 - `WHISPER_MODEL_SIZE`
 - `WHISPER_MODEL_PATH`
