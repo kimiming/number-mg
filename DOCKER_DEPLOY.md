@@ -61,6 +61,7 @@ Assuming the code is already uploaded to `/opt/number-manager`:
 ```bash
 cd /opt/number-manager
 mkdir -p public/uploads
+sudo chown -R 1001:1001 public/uploads
 cp .env.example .env
 ```
 

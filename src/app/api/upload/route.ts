@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ path: `/uploads/${storedName}`, verified: true });
+    return NextResponse.json({ path: `/api/uploads/${storedName}`, verified: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : '上传失败';
     return NextResponse.json({ error: message }, { status: 500 });

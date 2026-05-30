@@ -12,9 +12,11 @@ const TRANSCRIBE_SCRIPT = path.join(process.cwd(), "scripts", "transcribe.py");
 
 function normalizeFilename(input: string) {
   const value = input.trim().replace(/\\/g, "/");
-  const cleaned = value.startsWith("/uploads/")
-    ? value.slice("/uploads/".length)
-    : value;
+  const cleaned = value.startsWith("/api/uploads/")
+    ? value.slice("/api/uploads/".length)
+    : value.startsWith("/uploads/")
+      ? value.slice("/uploads/".length)
+      : value;
   return path.basename(cleaned);
 }
 

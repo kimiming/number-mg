@@ -1,18 +1,17 @@
 "use client";
 
 import {
+  DeleteOutlined,
+  EditOutlined,
   EyeOutlined,
   PlusOutlined,
-  ReloadOutlined,
-  EditOutlined,
-  DeleteOutlined,
+  ReloadOutlined
 } from "@ant-design/icons";
 import { Button, Card, Input, Space, Table, Tag, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import AudioPlayerWithTime from "@/components/myaudio";
-import CustomAudioPlayer from "@/components/audios-base";
 import { DeleteRecordButton } from "@/components/delete-record-button";
 
 type PhoneRecord = {
@@ -28,18 +27,14 @@ type RecordsTableProps = {
   initialRecords: PhoneRecord[];
 };
 
-export function RecordsTable({
-  readonly = false,
-  initialRecords,
-}: RecordsTableProps) {
+export function RecordsTable({ readonly = false, initialRecords }: RecordsTableProps) {
   const [records, setRecords] = useState<PhoneRecord[]>(initialRecords);
   const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
 
-  const formatDateTime = (value: string) =>
-    new Date(value).toLocaleString("zh-CN");
+  const formatDateTime = (value: string) => new Date(value).toLocaleString("zh-CN");
 
   const fetchRecords = async () => {
     setLoading(true);
@@ -76,15 +71,10 @@ export function RecordsTable({
     }
 
     return records.filter((record) =>
-      [
-        record.customerPhoneNumber,
-        record.whatsappNumber,
-        record.voiceFilePath ?? "",
-        record.createdAt,
-      ]
+      [record.customerPhoneNumber, record.whatsappNumber, record.voiceFilePath ?? "", record.createdAt]
         .join(" ")
         .toLowerCase()
-        .includes(text),
+        .includes(text)
     );
   }, [keyword, records]);
 
@@ -93,35 +83,35 @@ export function RecordsTable({
       {
         title: "序号",
         width: 90,
-        render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
+        render: (_, __, index) => (currentPage - 1) * pageSize + index + 1
       },
       {
         title: "客户电话",
-        dataIndex: "customerPhoneNumber",
+        dataIndex: "customerPhoneNumber"
       },
       {
         title: "接粉号",
-        dataIndex: "whatsappNumber",
+        dataIndex: "whatsappNumber"
       },
       {
         title: "创建时间",
         dataIndex: "createdAt",
         width: 180,
-        render: (value: string) => formatDateTime(value),
+        render: (value: string) => formatDateTime(value)
       },
       {
         title: "文件",
         dataIndex: "voiceFilePath",
         render: (value: string | null) =>
-          value ? <Tag color="green">已上传</Tag> : <Tag>未上传</Tag>,
+          value ? <Tag color="green">已上传</Tag> : <Tag>未上传</Tag>
       },
       {
         title: "语音播放",
         dataIndex: "voiceFilePath",
-        width: 120,
+        width: 150,
         render: (value: string | null) =>
-          value ? <CustomAudioPlayer value={value} /> : "暂无",
-      },
+          value ? <AudioPlayerWithTime value={value} /> : "暂无"
+      }
     ];
 
     if (readonly) {
@@ -133,7 +123,7 @@ export function RecordsTable({
             <EyeOutlined />
             详情
           </Link>
-        ),
+        )
       });
     } else {
       baseColumns.push({
@@ -145,24 +135,18 @@ export function RecordsTable({
               <EyeOutlined />
               详情
             </Link>
-            <Link
-              href={`/admin/records/${record.id}/edit`}
-              className="admin-action"
-            >
+            <Link href={`/admin/records/${record.id}/edit`} className="admin-action">
               <EditOutlined />
               编辑
             </Link>
             <DeleteRecordButton id={record.id}>
-              <button
-                className="admin-action admin-action-danger"
-                type="button"
-              >
+              <button className="admin-action admin-action-danger" type="button">
                 <DeleteOutlined />
                 删除
               </button>
             </DeleteRecordButton>
           </Space>
-        ),
+        )
       });
     }
 
@@ -185,10 +169,7 @@ export function RecordsTable({
               >
                 刷新
               </Button>
-              <Link
-                href="/admin/records/new"
-                className="admin-action admin-action-primary"
-              >
+              <Link href="/admin/records/new" className="admin-action admin-action-primary">
                 <PlusOutlined />
                 新增记录
               </Link>
@@ -214,7 +195,7 @@ export function RecordsTable({
         pagination={{
           pageSize,
           current: currentPage,
-          onChange: (page) => setCurrentPage(page),
+          onChange: (page) => setCurrentPage(page)
         }}
       />
     </Card>

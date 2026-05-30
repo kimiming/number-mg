@@ -1,45 +1,38 @@
 "use client";
-import React, { useRef, useState } from "react";
 
-// 1. 定义 Props 的类型接口
+import React, { useRef, useState } from "react";
+import { toPlayableAudioPath } from "@/lib/audio-path";
+
 interface AudioPlayerWithTimeProps {
-  value: string; // 音频的 URL 地址
+  value: string;
 }
 
 function AudioPlayerWithTime({ value }: AudioPlayerWithTimeProps) {
-  // 2. 为 useRef 显式指定 HTMLAudioElement 类型，初始值为 null
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
+  const src = toPlayableAudioPath(value);
 
-  // 秒数格式化函数
   const formatTime = (time: number): string => {
-    if (isNaN(time)) return "00:00";
-    const minutes = Math.floor(time / 60)
-      .toString()
-      .padStart(2, "0");
-    const seconds = Math.floor(time % 60)
-      .toString()
-      .padStart(2, "0");
+    if (Number.isNaN(time)) return "00:00";
+    const minutes = Math.floor(time / 60).toString().padStart(2, "0");
+    const seconds = Math.floor(time % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
   };
 
   const togglePlay = (): void => {
-    // 3. TypeScript 会提醒 audioRef.current 可能为 null，所以需要加个安全判断
     if (!audioRef.current) return;
 
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      void audioRef.current.play();
     }
     setIsPlaying(!isPlaying);
   };
 
-  // 4. 不需要显式写 React.SyntheticEvent，因为绑在原生标签上 TS 会自动推导，
-  // 但如果要显式写，可以直接用内部属性，非常安全
   const handleTimeUpdate = (): void => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
@@ -57,6 +50,10 @@ function AudioPlayerWithTime({ value }: AudioPlayerWithTimeProps) {
     setCurrentTime(0);
   };
 
+  if (!src) {
+    return null;
+  }
+
   return (
     <div
       style={{
@@ -65,12 +62,12 @@ function AudioPlayerWithTime({ value }: AudioPlayerWithTimeProps) {
         gap: "12px",
         fontFamily: "monospace",
         fontSize: "14px",
-        color: "#333",
+        color: "#333"
       }}
     >
       <audio
         ref={audioRef}
-        src={value}
+        src={src}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={handleEnded}
@@ -78,6 +75,7 @@ function AudioPlayerWithTime({ value }: AudioPlayerWithTimeProps) {
 
       <button
         onClick={togglePlay}
+        type="button"
         style={{
           width: "40px",
           height: "40px",
@@ -90,10 +88,10 @@ function AudioPlayerWithTime({ value }: AudioPlayerWithTimeProps) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          flexShrink: 0,
+          flexShrink: 0
         }}
       >
-        {isPlaying ? "⏸" : "▶"}
+        {isPlaying ? "❚❚" : "▶"}
       </button>
 
       <div>
