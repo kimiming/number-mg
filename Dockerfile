@@ -9,7 +9,7 @@ WORKDIR /app
 FROM base AS deps
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 python3-pip ffmpeg \
+  && apt-get install -y --no-install-recommends python3 python3-pip python3-venv ffmpeg \
   && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
@@ -22,7 +22,9 @@ RUN npm config set registry https://registry.npmjs.org/ \
   && npm config set fetch-retry-mintimeout 20000 \
   && npm config set fetch-retry-maxtimeout 120000
 RUN npm ci --no-audit --no-fund --verbose > /tmp/npm-ci.log 2>&1 || (cat /tmp/npm-ci.log && exit 1)
-RUN pip3 install --no-cache-dir -r scripts/requirements.txt
+RUN python3 -m venv /opt/venv \
+  && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
+  && /opt/venv/bin/pip install --no-cache-dir -r scripts/requirements.txt
 
 FROM deps AS builder
 
@@ -33,7 +35,7 @@ RUN npm run build
 FROM base AS runner
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 python3-pip ffmpeg \
+  && apt-get install -y --no-install-recommends python3 python3-pip python3-venv ffmpeg \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -49,6 +51,7 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY --from=builder /app/middleware.ts ./middleware.ts
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
@@ -59,6 +62,7 @@ RUN mkdir -p public/uploads \
 
 USER nextjs
 
+ENV PATH="/opt/venv/bin:$PATH"
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
