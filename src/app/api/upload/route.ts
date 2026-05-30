@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'fs/promises';
+import { access, mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import { NextResponse } from 'next/server';
 import { readSessionTokenFromCookieStore } from '@/lib/session';
@@ -35,23 +35,16 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(await file.arrayBuffer());
     await writeFile(targetPath, buffer);
 
-    const publicPath = `/uploads/${storedName}`;
-    const probeUrl = new URL(publicPath, request.url);
-    const probeResponse = await fetch(probeUrl, {
-      method: 'GET',
-      cache: 'no-store'
-    });
-
-    if (!probeResponse.ok) {
+    try {
+      await access(targetPath);
+    } catch {
       return NextResponse.json(
-        {
-          error: `上传文件已保存，但浏览器无法访问该地址（${probeResponse.status} ${probeResponse.statusText}）`
-        },
+        { error: '文件已写入但服务器端无法再次读取，上传目录挂载可能有问题' },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ path: publicPath, verified: true });
+    return NextResponse.json({ path: `/uploads/${storedName}`, verified: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : '上传失败';
     return NextResponse.json({ error: message }, { status: 500 });
