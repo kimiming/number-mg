@@ -2,6 +2,7 @@ import { Card, Descriptions, Space, Tag } from "antd";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DeleteRecordButton } from "@/components/delete-record-button";
+import { VoiceTranscribe } from "@/components/voice-transcribe";
 import { prisma } from "@/lib/prisma";
 import { toPlayableAudioPath } from "@/lib/audio-path";
 
@@ -20,6 +21,7 @@ export default async function AdminRecordDetailPage({
   }
 
   const playableAudioPath = toPlayableAudioPath(record.voiceFilePath);
+  const transcriptText = (record as { transcriptText?: string | null }).transcriptText ?? null;
 
   return (
     <main className="page-shell">
@@ -56,6 +58,11 @@ export default async function AdminRecordDetailPage({
                     {playableAudioPath}
                   </Link>
                   <audio controls src={playableAudioPath} style={{ width: "100%" }} />
+                  <VoiceTranscribe
+                    recordId={record.id}
+                    audioPath={playableAudioPath}
+                    initialTranscript={transcriptText}
+                  />
                 </Space>
               ) : (
                 "暂无语音文件"

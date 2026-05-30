@@ -2,18 +2,13 @@
 
 import { Button, Typography, message } from 'antd';
 import { useState } from 'react';
+import { getAudioFilename } from '@/lib/audio-path';
 
 type Props = {
   recordId: string;
   audioPath: string;
   initialTranscript?: string | null;
 };
-
-function getFilename(audioPath: string) {
-  const value = audioPath.trim();
-  const withoutQuery = value.split('?')[0] ?? value;
-  return withoutQuery.split('/').pop() ?? withoutQuery;
-}
 
 async function saveTranscript(recordId: string, transcriptText: string) {
   const response = await fetch(`/api/records/${recordId}/transcript`, {
@@ -36,6 +31,11 @@ export function VoiceTranscribe({ recordId, audioPath, initialTranscript }: Prop
   const buttonLabel = text ? '重新识别' : '语音转文字';
 
   const handleTranscribe = async () => {
+    if (!audioPath) {
+      message.error('没有可识别的音频文件');
+      return;
+    }
+
     setLoading(true);
     try {
       if (!text) {
@@ -45,7 +45,7 @@ export function VoiceTranscribe({ recordId, audioPath, initialTranscript }: Prop
       const response = await fetch('/api/whisper-local', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: getFilename(audioPath) })
+        body: JSON.stringify({ filename: getAudioFilename(audioPath) })
       });
 
       const data = (await response.json().catch(() => ({}))) as { text?: string; error?: string };
