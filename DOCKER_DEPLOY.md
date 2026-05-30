@@ -69,6 +69,7 @@ Open `.env` and set a strong password:
 POSTGRES_DB=phone_admin_system
 POSTGRES_USER=phone_admin
 POSTGRES_PASSWORD=change-me-now
+JWT_SECRET=change-me-to-a-long-random-secret
 ```
 
 Then edit the file on the server:
