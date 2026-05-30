@@ -69,7 +69,8 @@ Open `.env` and set a strong password:
 POSTGRES_DB=phone_admin_system
 POSTGRES_USER=phone_admin
 POSTGRES_PASSWORD=change-me-now
-JWT_SECRET=change-me-to-a-long-random-secret
+JWT_SECRET=ab57aa55eabe448488c7d45b9a5466dad2cf286e10c493ee8161442b89a09fe3
+COOKIE_SECURE=false
 ```
 
 Then edit the file on the server:
@@ -124,6 +125,8 @@ docker compose exec app npx prisma migrate deploy
 - `POSTGRES_DB`
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
+- `JWT_SECRET`
+- `COOKIE_SECURE`
 - `DATABASE_URL` is assembled automatically inside Compose
 - `WHISPER_MODEL_SIZE`
 - `WHISPER_MODEL_PATH`
