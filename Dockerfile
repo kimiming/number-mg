@@ -16,7 +16,12 @@ COPY package.json package-lock.json ./
 COPY prisma ./prisma
 COPY scripts/requirements.txt ./scripts/requirements.txt
 
-RUN npm ci \
+RUN sed -i 's#https://registry.npmmirror.com/#https://registry.npmjs.org/#g' package-lock.json \
+  && npm config set registry https://registry.npmjs.org/ \
+  && npm config set fetch-retries 5 \
+  && npm config set fetch-retry-mintimeout 20000 \
+  && npm config set fetch-retry-maxtimeout 120000 \
+  && npm ci --no-audit --no-fund --verbose \
   && pip3 install --no-cache-dir -r scripts/requirements.txt
 
 FROM deps AS builder
