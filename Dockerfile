@@ -35,7 +35,7 @@ RUN npm run build
 FROM base AS runner
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends python3 python3-pip python3-venv ffmpeg \
+  && apt-get install -y --no-install-recommends python3 python3-pip python3-venv ffmpeg gosu \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -60,7 +60,8 @@ COPY --from=builder /app/src ./src
 RUN mkdir -p public/uploads \
   && chown -R nextjs:nodejs /app
 
-USER nextjs
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PORT=3000
@@ -68,4 +69,5 @@ ENV HOSTNAME=0.0.0.0
 
 EXPOSE 3000
 
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["npm", "run", "start"]
